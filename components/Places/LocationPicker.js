@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, StyleSheet, Alert, Image, Text } from "react-native";
 import OutlinedButton from "../UI/OutlinedButton";
 import { Colors } from "../../constants/colors";
@@ -7,16 +7,48 @@ import {
   PermissionStatus,
   useForegroundPermissions,
 } from "expo-location";
-import { getMapPreview } from "../../utils/location";
-import { useNavigation } from "@react-navigation/native";
+import { getAddress, getMapPreview } from "../../utils/location";
+import {
+  useIsFocused,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native";
 
-function LocationPicker() {
+function LocationPicker({ onPickLocation }) {
   const [pickedLocation, setPickedLocation] = useState();
+
+  const isFocused = useIsFocused();
 
   const navigation = useNavigation();
 
+  const route = useRoute();
+
   const [locationPermissionInformation, requestPermission] =
     useForegroundPermissions();
+
+  useEffect(() => {
+    if (isFocused && route.params) {
+      const mapPickedLocation = {
+        lat: route.params.pickedLat,
+        lng: route.params.pickedLng,
+      };
+
+      setPickedLocation(mapPickedLocation);
+    }
+  }, [route, isFocused]);
+
+  useEffect(() => {
+    async function handleLocation() {
+      if (pickedLocation) {
+        const address = await getAddress(
+          pickedLocation.lat,
+          pickedLocation.lng
+        );
+        onPickLocation({ ...pickedLocation, address: address });
+      }
+    }
+    handleLocation();
+  }, [pickedLocation, onPickLocation]);
 
   async function verifyPermissions() {
     if (
@@ -49,19 +81,15 @@ function LocationPicker() {
   }
 
   function pickOnMapHandler() {
-    navigation.navigate('Map');
+    navigation.navigate("Map");
   }
 
   let locationPreview = <Text>No location picked yet.</Text>;
 
   if (pickedLocation) {
     const mapPreviewUrl = getMapPreview(pickedLocation.lat, pickedLocation.lng);
-    console.log(mapPreviewUrl); 
     locationPreview = (
-      <Image
-        style={styles.mapPreviewImage}
-        source={{ uri: mapPreviewUrl }}
-      />
+      <Image style={styles.mapPreviewImage} source={{ uri: mapPreviewUrl }} />
     );
   }
 
@@ -91,7 +119,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: Colors.primary100,
     borderRadius: 5,
-    overflow: 'hidden'
+    overflow: "hidden",
   },
   actions: {
     flexDirection: "row",
