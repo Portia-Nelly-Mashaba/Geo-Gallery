@@ -1,5 +1,5 @@
-import React from 'react';
-import { GestureHandlerRootView } from "react-native-gesture-handler";
+import React, { useEffect, useState } from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -7,11 +7,30 @@ import AllPlaces from './screens/AllPlaces';
 import AddPlace from './screens/AddPlace';
 import IconButton from './components/UI/IconButton';
 import { Colors } from './constants/colors';
-import Map from './screens/Map'; // Import the Map screen
+import Map from './screens/Map';
+import { init } from './utils/database';
+import * as SplashScreen from 'expo-splash-screen';
 
 const Stack = createNativeStackNavigator();
 
+SplashScreen.preventAutoHideAsync(); // Prevent the splash screen from auto-hiding
+
 export default function App() {
+  const [dbInitialized, setDbInitialized] = useState(false);
+
+  useEffect(() => {
+    init().then(() => {
+      setDbInitialized(true);
+      SplashScreen.hideAsync(); // Hide the splash screen once the DB is initialized
+    }).catch(err => {
+      console.log('Database initialization error:', err);
+    });
+  }, []);
+
+  if (!dbInitialized) {
+    return null; // Render nothing while waiting for DB initialization
+  }
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <StatusBar style="dark" />
@@ -24,9 +43,9 @@ export default function App() {
           <Stack.Screen 
             name="AllPlaces" 
             component={AllPlaces}  
-            options={({navigation}) => ({ 
+            options={({ navigation }) => ({ 
               title: 'Your Favorite Places',
-              headerRight: ({tintColor}) => (
+              headerRight: ({ tintColor }) => (
                 <IconButton 
                   icon='add' 
                   size={24} 
@@ -40,7 +59,7 @@ export default function App() {
             name="AddPlace" 
             component={AddPlace} 
             options={{
-              title:'Add a new Place'
+              title: 'Add a new Place'
             }}
           />
           <Stack.Screen 
