@@ -7,6 +7,7 @@ import Button from "../UI/Button";
 import { Place } from "../../models/place";
 
 function PlaceForm({onCreatePlace}) {
+// function PlaceForm() {
     const [title, setTitle] = useState('');
     const [selectedImage, setSelectedImage] = useState();
     const [pickedLocation, setPickedLocation] = useState();
@@ -26,9 +27,9 @@ function PlaceForm({onCreatePlace}) {
     function savePlaceHandler() {
         const placeData = new Place(title, selectedImage, pickedLocation);
         onCreatePlace(placeData);
-        // console.log(title);
-        // console.log(selectedImage);
-        // console.log(pickedLocation);
+        console.log(title);
+        console.log(selectedImage);
+        console.log(pickedLocation);
     }
 
     return (
