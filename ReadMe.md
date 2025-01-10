@@ -1,7 +1,3 @@
-Sure! Here's a simple README file for your Geo Gallery app:
-
----
-
 # Geo Gallery App
 
 ## Description
