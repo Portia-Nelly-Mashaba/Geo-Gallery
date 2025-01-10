@@ -10,6 +10,7 @@ import { Colors } from './constants/colors';
 import Map from './screens/Map';
 import { init } from './utils/database';
 import * as SplashScreen from 'expo-splash-screen';
+import PlaceDetails from './screens/PlaceDetails';
 
 const Stack = createNativeStackNavigator();
 
@@ -48,7 +49,7 @@ export default function App() {
               headerRight: ({ tintColor }) => (
                 <IconButton 
                   icon='add' 
-                  size={24} 
+                  size={26} 
                   color={tintColor} 
                   onPress={() => navigation.navigate('AddPlace')} 
                 />
@@ -69,6 +70,7 @@ export default function App() {
               title: 'Map'
             }} 
           />
+          <Stack.Screen name='PlaceDetails' component={PlaceDetails} options={{ title: 'Loading Place...'}} />
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>
